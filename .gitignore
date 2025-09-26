@@ -24,3 +24,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Custom ignores (project cleanup)
+BootCamp/
+reddit-client/
