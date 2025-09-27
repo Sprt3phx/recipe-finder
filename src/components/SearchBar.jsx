@@ -20,7 +20,7 @@ function SearchBar({ onSearch }) {
                 placeholder="Search recipes..."
                 className="flex-1 p-2 border rounded"
             />
-            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            <button type="submit" className="bg-blue-500 px-4 py-2  rounded hover:bg-blue-600">
                 Search
             </button>
         </form> 

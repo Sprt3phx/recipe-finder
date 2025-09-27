@@ -2,12 +2,20 @@ import { useState, useEffect} from 'react'
 import './App.css'
 import SearchBar from './components/SearchBar'
 import RecipeCard from './components/RecipeCard'  
+import Favorites from './components/Favorites'
+import RecipeDetail from './components/RecipeDetail'
+
 
 function App() {
   const [recipes, setRecipes] = useState([])
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
+
+  // Handle search queries
   async function handleSearch(query) {
     setLoading(true);
     try {
@@ -26,10 +34,34 @@ function App() {
     }
   }
 
+  function handleSelect(recipe) {
+    setSelectedRecipe(recipe);
+    setShowModal(true);
+  }
+
+  function handleClose() {
+    setSelectedRecipe(null);
+    setShowModal(false);
+  }
+
+  
+  function toggleFavorite(recipe) { 
+    //Check if it's already in favorites
+    const isFav = favorites.some((fav) => fav.idMeal === recipe.idMeal);
+    if (isFav) { 
+      // Remove from favorites
+      setFavorites(favorites.filter((fav) => fav.idMeal !== recipe.idMeal));
+    } else { 
+      // Add to favorites
+      setFavorites([...favorites, recipe]);
+    }
+    
+  }
+
 
   useEffect(() => {
     // Fetch recipes from an API or local data source
-    fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=beef')
+    fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=pie')
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
@@ -55,14 +87,32 @@ function App() {
       {/* Loading State */}
       {loading && <p>Loading...</p>}
 
+      {showModal && selectedRecipe && (
+        <RecipeDetail
+          recipe={selectedRecipe}
+          onClose={handleClose}
+        />
+      )}
+
       {/* Recipes List */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {recipes.map((recipe) => (
-          <div className="border p-4 rounded shadow">
-            <RecipeCard key={recipe.idMeal} recipe={recipe} />
-          </div>
-        ))}
+        {!loading && recipes.length === 0 ? (
+          <p className="text-gray-600">No recipes found for your search. Try another ingredient or dish name.</p>
+        ) : (
+          recipes.map((recipe) => (
+            <RecipeCard
+              key={recipe.idMeal}
+              recipe={recipe}
+              toggleFavorite={toggleFavorite}
+              isFavorite={favorites.some((fav) => fav.idMeal === recipe.idMeal)}
+              onSelect={handleSelect}
+            />
+          ))
+        )}
       </div>
+
+      {/* Favorites Component - Future Use */}
+  <Favorites favorites={favorites} />
     </div>
   );
 }
